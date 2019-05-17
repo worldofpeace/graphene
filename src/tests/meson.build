@@ -22,8 +22,17 @@ unit_tests = [
 python = python3.find_python()
 gen_installed_test = join_paths(meson.current_source_dir(), 'gen-installed-test.py')
 
-installed_test_datadir = join_paths(get_option('prefix'), get_option('datadir'), 'installed-tests', graphene_api_path)
-installed_test_bindir = join_paths(get_option('prefix'), get_option('libexecdir'), 'installed-tests', graphene_api_path)
+test_suffix = join_paths('installed-tests', graphene_api_path)
+
+test_datadir = join_paths(get_option('installed_test_datadir'), test_suffix)
+if test_datadir == ''
+    test_datadir = join_paths(get_option('prefix'), get_option('datadir'), test_suffix)
+endif
+
+test_bindir = join_paths(get_option('installed_test_bindir'), test_suffix)
+if test_bindir == ''
+    test_bindir = join_paths(get_option('prefix'), get_option('libexecdir'), test_suffix)
+endif
 
 foreach unit: unit_tests
   wrapper = '@0@.test'.format(unit)
@@ -32,13 +41,13 @@ foreach unit: unit_tests
                        command: [
                          python,
                          gen_installed_test,
-                         '--testdir=@0@'.format(installed_test_bindir),
+                         '--testdir=@0@'.format(test_bindir),
                          '--testname=@0@'.format(unit),
                          '--outdir=@OUTDIR@',
                          '--outfile=@0@'.format(wrapper),
                        ],
                        install: true,
-                       install_dir: installed_test_datadir)
+                       install_dir: test_datadir)
 
   exe = executable(unit, unit + '.c',
                    dependencies: graphene_dep,
@@ -50,7 +59,7 @@ foreach unit: unit_tests
                      '-DGLIB_DISABLE_DEPRECATION_WARNINGS',
                    ],
                    install: true,
-                   install_dir: installed_test_bindir)
+                   install_dir: test_bindir)
 
   test(unit, exe, args: [ '--tap', '-k' ])
 endforeach

@@ -19,6 +19,12 @@ option('arm_neon', type: 'boolean',
 option('tests', type: 'boolean',
        value: true,
        description: 'Build the test suite (requires GObject)')
+option('installed_test_datadir', type: 'string',
+       value: '',
+       description: 'Installation directory for data files in tests')
+option('installed_test_bindir', type: 'string',
+       value: '',
+       description: 'Installation directory for binary files in tests')
 option('benchmarks', type: 'boolean',
        value: true,
        description: 'Build the benchmarks suite (requires GObject)')
